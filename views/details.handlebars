@@ -1,9 +1,9 @@
-<h1>{{user.first_name}} {{user.last_name}} [{{user.id}}]</h1>
+<h1>{{user.type}} {{user.brand}} [{{user.id}}]</h1>
 <ul class="list-group">
-    <li class="list-group-item">Email: {{user.email}}</li>
-    <li class="list-group-item">Phone: {{user.phone}}</li>
+    <li class="list-group-item">Price, $: {{user.price}}</li>
+    <li class="list-group-item">Place: {{user.place}}</li>
 </ul>
 <a class="btn btn-default pull-left" href="/">Back</a>
-<form method="POST" action="/user/delete/{{user.id}}?_method=DELETE">
+<form method="POST" action="/equip/delete/{{user.id}}?_method=DELETE">
     <input type="submit" class="btn btn-danger pull-right" value="Delete">
 </form>

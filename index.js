@@ -1,15 +1,14 @@
-const express= require('express');
-const redis = require('redis');
-const handlebars = require('express-handlebars');
-const path = require('path');
-const methodOverride = require('method-override');
-const bodyParser = require('body-parser');
+import express from 'express';
+import { createClient } from 'redis';
+import handlebars from 'express-handlebars';
+import methodOverride from 'method-override';
+import { json, urlencoded } from 'body-parser';
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 
-const client = redis.createClient();
+const client = createClient();
 client.on('connect', () => {
     console.log('Redis is here!')
 })
@@ -18,8 +17,8 @@ app.listen(PORT, () => {
     console.log(`App is listening on ${PORT}`)
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(json());
+app.use(urlencoded({extended: false}));
 
 // view engine
 app.engine('handlebars', handlebars({default: 'main'}))
@@ -29,15 +28,15 @@ app.set('view engine', 'handlebars')
 app.use(methodOverride('_method'));
 
 app.get('/', (req, res, next) => {
-    res.render('searchusers')
+    res.render('searchequip')
 });
 
-app.post('/user/search', function(req, res, next){
+app.post('/equip/search', function(req, res, next){
     let id = req.body.id;
   
-    client.hgetall(id, function(err, obj){
+    client.hgetall(id, function(error, obj){
       if(!obj){
-        res.render('searchusers', {
+        res.render('searchequip', {
           error: 'Equipment does not exist'
         });
       } else {
@@ -50,22 +49,22 @@ app.post('/user/search', function(req, res, next){
   });
 
   // add user page
-  app.get('/user/add', (req, res, next) => {
-    res.render('adduser')
+  app.get('/equip/add', (req, res, next) => {
+    res.render('addequip')
 });
 
-app.post('/user/add', function(req, res) {
+app.post('/equip/add', function(req, res) {
     let id = req.body.id;
-    let first_name = req.body.first_name;
-    let last_name = req.body.last_name;
-    let email = req.body.email;
-    let phone = req.body.phone;
+    let type = req.body.type;
+    let brand = req.body.brand;
+    let price = req.body.price;
+    let place = req.body.place;
 
     client.hset(id, [
-        'first_name', first_name,
-        'last_name', last_name,
-        'email', email,
-        'phone', phone
+        'type', type,
+        'brand', brand,
+        'price', price,
+        'place', place
     ], function(err, reply) {
         if (err) {
             console.error(err);
@@ -76,7 +75,7 @@ app.post('/user/add', function(req, res) {
 });
 
 // delete user
-app.delete('/user/delete/:id', function(req, res) {
+app.delete('/equip/delete/:id', function(req, res) {
     client.del(req.params.id);
     res.redirect('/');
 });
